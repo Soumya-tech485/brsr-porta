@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MEIL ESGraph</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/pages/admin-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Additional sidebar layout overrides */
+        .sidebar-header { background: var(--color-bg-body); }
+        .sidebar { background: var(--color-sidebar); }
+    </style>
+</head>
+<body>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/charts.js"></script>
+    
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="background: var(--gradient-primary); color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 1.2rem;">M</div>
+                <h2>ESGraph</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-item active">Dashboard</a></li>
+                <li><a href="completion.html" class="nav-item">Completion</a></li>
+                <li><a href="corporate.html" class="nav-item">Corporate Data</a></li>
+                <li><a href="drilldown.html" class="nav-item">Drilldown</a></li>
+                <li><a href="reports.html" class="nav-item">Reports</a></li>
+                <li><a href="setup.html" class="nav-item">System Setup</a></li>
+                <li><a href="audit.html" class="nav-item">Audit Log</a></li>
+            </ul>
+            <div style="padding: var(--spacing-4);">
+                <button class="nav-item" style="width: 100%; background: none; border: none; text-align: left;" onclick="window.App.api.logout()">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Section 0: Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1>Group ESG Dashboard</h1>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                        <select class="btn btn-outline" style="padding: 2px 8px; font-size: 12px; height: auto;">
+                            <option value="1">FY 2024-25</option>
+                            <option value="2">FY 2023-24</option>
+                        </select>
+                        <span class="text-muted">| Group > All Subsidiaries</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-outline" onclick="exportReport('pdf')">PDF</button>
+                    <button class="btn" onclick="exportReport('xlsx')">Export Excel</button>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--border-color);">
+                        <div style="width: 32px; height: 32px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">A</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">Admin</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Group ESG</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content dashboard-grid" id="dashboard-content">
+                
+                <!-- Section 1: Readiness Strip -->
+                <div class="readiness-strip">
+                    <div class="flex items-center gap-4">
+                        <div class="readiness-ring-container">
+                            <svg viewBox="0 0 80 80" width="80" height="80">
+                                <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
+                                <circle id="readiness-ring-circle" cx="40" cy="40" r="36" fill="none" stroke="white" stroke-width="8" stroke-dasharray="226 226" stroke-dashoffset="0" transform="rotate(-90 40 40)" style="transition: stroke-dashoffset 1s ease;"/>
+                            </svg>
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem;" id="readiness-score">--%</div>
+                        </div>
+                        <div class="readiness-info">
+                            <h2>BRSR Core Readiness</h2>
+                            <p class="text-sm" style="color: rgba(255,255,255,0.8);">Essential & Core indicators completed</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 text-right">
+                        <div>
+                            <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">Open Period</span>
+                            <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">Consolidated</span>
+                        </div>
+                        <div style="border-left: 1px solid rgba(255,255,255,0.2); padding-left: 16px;">
+                            <div style="font-size: 1.25rem; font-weight: 700;" id="sites-count">- / -</div>
+                            <div class="text-xs" style="color: rgba(255,255,255,0.8);">Sites reporting</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: 9 BRSR Core KPI Cards -->
+                <div class="kpi-grid">
+                    <!-- Attr 1: GHG -->
+                    <div class="card hoverable kpi-card kpi-green">
+                        <div class="kpi-header">
+                            <div class="kpi-icon">🌿</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-ghg"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">GHG Footprint (Scope 1+2)</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-ghg">--</div>
+                            <div class="kpi-unit">tCO2e</div>
+                            <div class="kpi-trend down good">↓ 8%</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-ghg-int">-- / ₹Cr</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Attr 2: Water -->
+                    <div class="card hoverable kpi-card kpi-teal">
+                        <div class="kpi-header">
+                            <div class="kpi-icon">💧</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-water"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Water Withdrawal</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-water">--</div>
+                            <div class="kpi-unit">kL</div>
+                            <div class="kpi-trend up bad">↑ 5%</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-water-con">-- consumed</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+
+                    <!-- Attr 3: Energy -->
+                    <div class="card hoverable kpi-card kpi-amber">
+                        <div class="kpi-header">
+                            <div class="kpi-icon">⚡</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-energy"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Total Energy</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-energy">--</div>
+                            <div class="kpi-unit">GJ</div>
+                            <div class="kpi-trend down good">↓ 2%</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-energy-ren">--% Renewable</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Attr 4: Waste -->
+                    <div class="card hoverable kpi-card kpi-violet">
+                        <div class="kpi-header">
+                            <div class="kpi-icon">♻️</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-waste"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Waste Generated</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-waste">--</div>
+                            <div class="kpi-unit">MT</div>
+                            <div class="kpi-trend down good">↓ 12%</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-waste-rec">--% recovered</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Attr 5: Safety -->
+                    <div class="card hoverable kpi-card kpi-rose">
+                        <div class="kpi-header">
+                            <div class="kpi-icon">👷</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-safety"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Employee Safety (LTIFR)</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-safety">--</div>
+                            <div class="kpi-unit">rate</div>
+                            <div class="kpi-trend down good">↓ 0.1</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-safety-fat">-- Fatalities</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Attr 6: Gender -->
+                    <div class="card hoverable kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">👥</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-gender"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Gender Diversity (Wage %)</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-gender">--</div>
+                            <div class="kpi-unit">%</div>
+                            <div class="kpi-trend up good">↑ 2%</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-gender-posh">-- POSH cases</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+
+                    <!-- Attr 7: Inclusive -->
+                    <div class="card hoverable kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">🤝</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-inclusive"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Inclusive Dev (MSME)</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-inclusive">--</div>
+                            <div class="kpi-unit">%</div>
+                            <div class="kpi-trend up good">↑ 5%</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-inclusive-local">--% Local jobs</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+
+                    <!-- Attr 8: Fairness -->
+                    <div class="card hoverable kpi-card" style="border-top: 4px solid #475569;">
+                        <div class="kpi-header">
+                            <div class="kpi-icon" style="background: rgba(71, 85, 105, 0.1); color: #475569;">⚖️</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-fairness"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Fairness (Data Breaches)</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-fairness">--</div>
+                            <div class="kpi-unit">incidents</div>
+                            <div class="kpi-trend">-</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-fairness-days">-- days payable</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+
+                    <!-- Attr 9: Openness -->
+                    <div class="card hoverable kpi-card" style="border-top: 4px solid #475569;">
+                        <div class="kpi-header">
+                            <div class="kpi-icon" style="background: rgba(71, 85, 105, 0.1); color: #475569;">🏢</div>
+                            <div class="chart-wrapper" style="width: 80px; height: 30px;"><canvas id="spark-openness"></canvas></div>
+                        </div>
+                        <div class="text-sm text-muted mb-4">Openness (Related Party)</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" id="val-openness">--</div>
+                            <div class="kpi-unit">%</div>
+                            <div class="kpi-trend down good">↓ 1%</div>
+                        </div>
+                        <div class="kpi-details">
+                            <span id="val-openness-conc">-- index</span>
+                            <a href="#">Drill down →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 & 5: Trend Charts & Flags -->
+                <div class="grid-cols-3-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">GHG Emissions Trend (tCO2e)</h3>
+                            <span class="badge badge-success">✓ ML Forecast Active</span>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-ghg"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Insights & Anomalies</h3>
+                            <span class="badge badge-warning">3 Unresolved</span>
+                        </div>
+                        <div class="flag-list" id="flag-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4 & 6: Heatmap & Resource Chart -->
+                <div class="grid-cols-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Completion Heatmap</h3>
+                            <a href="completion.html" class="text-sm">Full View →</a>
+                        </div>
+                        <div class="heatmap-container">
+                            <table class="heatmap-table">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left; padding-right: 16px;">Site</th>
+                                        <th colspan="12" style="font-size: 10px; text-align: left;">Apr ----------------------- Mar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="heatmap-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                            <div class="flex gap-4 mt-4 text-xs text-muted">
+                                <div class="flex items-center gap-2"><div class="heatmap-cell hm-draft" style="width:12px; height:12px;"></div> Draft</div>
+                                <div class="flex items-center gap-2"><div class="heatmap-cell hm-sub" style="width:12px; height:12px;"></div> Sub</div>
+                                <div class="flex items-center gap-2"><div class="heatmap-cell hm-ver" style="width:12px; height:12px;"></div> Verified</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Energy Breakdown by Subsidiary</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-resource"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 7 & 8: Leaderboard & Management -->
+                <div class="grid-cols-3-2">
+                    <div class="card" style="overflow-x: auto;">
+                        <div class="card-header">
+                            <h3 class="card-title">Site Leaderboard</h3>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Site Name</th>
+                                    <th>Readiness</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Site A-1 (Highway)</td>
+                                    <td><div style="width: 100%; background: #e2e8f0; height: 6px; border-radius: 3px;"><div style="width: 95%; background: var(--color-success); height: 100%; border-radius: 3px;"></div></div></td>
+                                    <td><span class="badge badge-success">On Track</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Site B-1 (Hydro)</td>
+                                    <td><div style="width: 100%; background: #e2e8f0; height: 6px; border-radius: 3px;"><div style="width: 45%; background: var(--color-warning); height: 100%; border-radius: 3px;"></div></div></td>
+                                    <td><span class="badge badge-warning">Delayed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Site C-2 (Solar)</td>
+                                    <td><div style="width: 100%; background: #e2e8f0; height: 6px; border-radius: 3px;"><div style="width: 80%; background: var(--color-info); height: 100%; border-radius: 3px;"></div></div></td>
+                                    <td><span class="badge badge-info">In Review</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h3 class="card-title">Recent Audit</h3>
+                            </div>
+                            <div class="text-sm">
+                                <div class="mb-4"><strong>Ramesh K.</strong> verified Site A-1 data <br><span class="text-xs text-muted">2 mins ago</span></div>
+                                <div class="mb-4"><strong>Amit S.</strong> submitted Site B-2 water <br><span class="text-xs text-muted">1 hr ago</span></div>
+                                <div><strong>System</strong> generated ML forecast <br><span class="text-xs text-muted">3 hrs ago</span></div>
+                            </div>
+                        </div>
+
+                        <div class="period-strip" style="margin-top:0;">
+                            <div>
+                                <h4 class="text-base">Period Management</h4>
+                                <span class="badge badge-neutral mt-4">Status: Open</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-outline" onclick="reopenPeriod()">Reopen</button>
+                                <button class="btn" style="background: var(--color-sidebar);" onclick="lockPeriod()">🔒 Lock Period</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="text-align: center; padding: var(--spacing-6); color: var(--color-text-muted); font-size: var(--text-xs);">
+                    Synthetic demo data. Not for actual reporting.
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../js/pages/admin-dashboard.js"></script>
+</body>
+</html>

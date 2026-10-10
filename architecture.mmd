@@ -1,0 +1,79 @@
+flowchart TD
+    %% User Roles
+    subgraph Users ["User Roles (RBAC)"]
+        direction LR
+        Admin(["Group ESG Admin"])
+        Manager(["Site Manager"])
+        Engineer(["Site Engineer"])
+    end
+
+    %% Frontend Layer
+    subgraph Frontend ["Frontend (Vanilla JS + HTML + CSS)"]
+        direction TB
+        UI["Web UI Components"]
+        API_Wrapper["js/api.js (Central API Wrapper)"]
+        UI --> API_Wrapper
+        
+        %% Role specific views
+        AdminView["Admin Dashboards"]
+        ManagerView["Review Queues"]
+        EngineerView["Data Entry Forms"]
+        
+        UI -.-> AdminView
+        UI -.-> ManagerView
+        UI -.-> EngineerView
+    end
+
+    %% Backend Layer
+    subgraph Backend ["Backend (Python + FastAPI)"]
+        direction TB
+        Routers["HTTP Routers (app/routers)"]
+        Auth["Security & Auth (JWT/Bcrypt)"]
+        Services["Business Services (app/services)"]
+        ML["AI/ML Layer (pandas, scikit-learn)"]
+        Models["SQLAlchemy ORM (app/models)"]
+        
+        Routers --> Auth
+        Auth --> Services
+        Services --> ML
+        Services --> Models
+    end
+
+    %% Database Layer
+    subgraph Database ["Database Layer (MySQL / SQLite)"]
+        direction TB
+        DB[(Relational DB)]
+        
+        subgraph Tables ["Key Data Domains"]
+            UsersDB["Users & Roles"]
+            EntitiesDB["Entities (Sites, BUs)"]
+            IndicatorsDB["Indicator Catalogue"]
+            EntriesDB["Site Entries & Evidence"]
+            AuditDB["Audit Logs"]
+        end
+        
+        DB --- Tables
+    end
+
+    %% Reporting Output
+    Reports[["BRSR PDF & Excel Reports"]]
+
+    %% Connections
+    Users -->|Interacts via Browser| Frontend
+    API_Wrapper -->|REST API - JSON| Routers
+    Models -->|SQL Queries| DB
+    
+    %% Output connections
+    Services -->|Generates| Reports
+    Admin -.->|Downloads| Reports
+    
+    %% Styling
+    classDef role fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef front fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef back fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    classDef db fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    
+    class Admin,Manager,Engineer role;
+    class Frontend,UI,API_Wrapper,AdminView,ManagerView,EngineerView front;
+    class Backend,Routers,Auth,Services,ML,Models back;
+    class Database,DB,UsersDB,EntitiesDB,IndicatorsDB,EntriesDB,AuditDB db;

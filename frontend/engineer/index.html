@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineer Dashboard - ESGraph</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/pages/forms.css">
+    <style>
+        .sidebar-header { background: var(--color-bg-body); }
+        .sidebar { background: var(--color-sidebar); }
+    </style>
+</head>
+<body>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="background: var(--gradient-success); color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 1.2rem;">M</div>
+                <h2>ESGraph</h2>
+            </div>
+            <div style="padding: var(--spacing-4); padding-bottom: 0;">
+                <div class="text-xs text-muted mb-2">SITE SELECTION</div>
+                <select class="form-control" style="width: 100%; background: rgba(255,255,255,0.1); color: white; border: none;">
+                    <option>Site A-1 (Highway)</option>
+                    <option>Site A-2 (Bridge)</option>
+                </select>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-item active">Data Entry</a></li>
+                <li><a href="history.html" class="nav-item">Submission History</a></li>
+            </ul>
+            <div style="padding: var(--spacing-4);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <div style="width: 32px; height: 32px; background: var(--gradient-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">E</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem; color: white;">Ramesh K.</div>
+                        <div style="font-size: 0.75rem; color: #cbd5e1;">Site Engineer</div>
+                    </div>
+                </div>
+                <button class="nav-item" style="width: 100%; background: none; border: none; text-align: left; padding: 0;" onclick="window.App.api.logout()">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1>Monthly ESG Data Entry</h1>
+                    <p>Enter data for Site A-1 (Highway)</p>
+                </div>
+                <div class="topbar-right">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-semibold">Reporting Month:</span>
+                        <select class="btn btn-outline" style="padding: 4px 8px;">
+                            <option value="2024-04">April 2024</option>
+                            <option value="2024-03">March 2024 (Locked)</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                
+                <div class="form-layout">
+                    <!-- Form Navigation -->
+                    <div class="form-sidebar">
+                        <h3 class="text-sm text-muted mb-2">BRSR Core Attributes</h3>
+                        <div class="progress-bar mb-4" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div style="width: 20%; background: var(--color-success); height: 100%;"></div>
+                        </div>
+                        <div class="text-xs text-muted text-right">20% Complete</div>
+                        
+                        <ul class="form-nav-list" id="form-nav">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Form Content Area -->
+                    <div class="form-content-area">
+                        <div class="form-header">
+                            <div>
+                                <h2 id="current-tab-title">Energy Footprint</h2>
+                                <p class="text-sm text-muted mt-1">Provide accurate consumption logs and attach valid bills.</p>
+                            </div>
+                            <span class="badge badge-warning">Draft</span>
+                        </div>
+                        
+                        <div class="form-body" id="form-fields-container">
+                            <!-- Populated by JS -->
+                        </div>
+                        
+                        <div class="form-footer">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-muted" id="draft-status">All changes saved to Draft</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-outline" onclick="saveDraft()">Save Draft</button>
+                                <button class="btn" style="background: var(--color-success);" onclick="submitForm()">Submit for Review</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: var(--spacing-6); color: var(--color-text-muted); font-size: var(--text-xs);">
+                    Synthetic demo data. Not for actual reporting.
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../js/pages/engineer-form.js"></script>
+</body>
+</html>

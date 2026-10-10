@@ -1,0 +1,5 @@
+# MySQL root password is "root"
+cmd.exe /c "docker exec -i esgraph_db mysql -u root -proot < ..\database\schema.sql"
+cmd.exe /c "docker exec -i esgraph_db mysql -u root -proot esgraph < ..\database\seed_indicators.sql"
+cmd.exe /c "docker exec -i esgraph_db mysql -u root -proot esgraph < ..\database\seed_demo.sql"
+Write-Host "Database reset complete!"

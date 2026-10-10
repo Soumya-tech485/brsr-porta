@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Environment secrets — NEVER commit
+.env
+backend/.env
+
+# Database files (local dev)
+*.db
+*.sqlite3
+esgraph.db
+backend/esgraph.db
+
+# Uploads (user files)
+uploads/
+
+# ML model artefacts > 5 MB
+*.pkl
+*.joblib
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Node (just in case)
+node_modules/

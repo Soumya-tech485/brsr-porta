@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard - ESGraph</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/pages/review.css">
+    <style>
+        .sidebar-header { background: var(--color-bg-body); }
+        .sidebar { background: var(--color-sidebar); }
+    </style>
+</head>
+<body>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="background: var(--gradient-warning); color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 1.2rem;">M</div>
+                <h2>ESGraph</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-item active">Review Queue</a></li>
+                <li><a href="site.html" class="nav-item">Site Dashboard</a></li>
+            </ul>
+            <div style="padding: var(--spacing-4);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <div style="width: 32px; height: 32px; background: var(--gradient-warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">S</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem; color: white;">Sita Devi</div>
+                        <div style="font-size: 0.75rem; color: #cbd5e1;">Site Manager</div>
+                    </div>
+                </div>
+                <button class="nav-item" style="width: 100%; background: none; border: none; text-align: left; padding: 0;" onclick="window.App.api.logout()">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1>Data Verification</h1>
+                    <p>Review submitted data from assigned sites.</p>
+                </div>
+            </header>
+
+            <div class="dashboard-content" style="padding: 0; display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                
+                <div class="review-layout" style="margin: var(--spacing-6); flex: 1;">
+                    <!-- Queue Panel -->
+                    <div class="review-queue">
+                        <div class="queue-header">
+                            <h3 class="text-base">Pending Reviews (2)</h3>
+                        </div>
+                        <div class="queue-list" id="queue-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Workspace Panel -->
+                    <div class="review-workspace" id="review-workspace">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: var(--spacing-4); color: var(--color-text-muted); font-size: var(--text-xs); border-top: 1px solid var(--border-color); background: #f8fafc;">
+                    Synthetic demo data. Not for actual reporting.
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../js/pages/manager-review.js"></script>
+</body>
+</html>
